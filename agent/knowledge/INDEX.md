@@ -6,3 +6,4 @@
 | `prompt-library.md` | Шаблоны промптов по типу объекта (жилое/HoReCa/реставрация) | При генерации промпта |
 | `styles-catalog.md` | Каталог визуальных стилей с описаниями и ключевыми словами | При выборе направления |
 | `fal-api.md` | Документация fal.ai Nano Banana + troubleshooting | При проблемах с API |
+| `mcp-integrations.md` | MCP-серверы для расширения: fal MCP, archicad-mcp, SketchUp Connector, Higgsfield | При настройке или расширении агента |

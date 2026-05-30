@@ -139,6 +139,30 @@ python scripts/viz_render.py --mode gpt --count 2 \
 | `--count` | Количество вариантов (default: 3) |
 | `--strength` | Сила трансформации 0.5–1.0 |
 
+## Расширить через MCP
+
+Агент работает из коробки, но становится мощнее с MCP-серверами.
+
+**Минимальный апгрейд (10 минут):**
+
+```bash
+# 1. Официальный fal MCP — агент сам выбирает лучшую модель из 1000+ каталога
+claude mcp add --transport http fal-ai https://mcp.fal.ai/mcp \
+  --header "Authorization: Bearer YOUR_FAL_KEY"
+
+# 2. Показывает рендеры прямо в чате
+npm install -g image-viewer-mcp
+```
+
+**Стратегически:**
+- `tapir-archicad-MCP` — прямой доступ к открытой модели ArchiCAD (читает геометрию, материалы без ручного экспорта)
+- `SketchUp Connector` — официальный MCP от Trimble для `.skp`-файлов (апрель 2026)
+- `Higgsfield MCP` — видео из рендера: Sora 2, Veo 3.1, Kling 3.0 (flythrough-презентации клиентам)
+
+Полный гайд с установкой → [agent/knowledge/mcp-integrations.md](agent/knowledge/mcp-integrations.md)
+
+---
+
 ## Победные промпты
 
 Готовые проверенные промпты — в [agent/memory.md](agent/memory.md):
