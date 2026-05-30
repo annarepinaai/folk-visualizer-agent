@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Гайд по подготовке материалов — Folk Studio Visualizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --graphite: #2A2825;
+    --cream:    #F5F0E8;
+    --stone:    #8C8078;
+    --terra:    #9B5B3A;
+    --copper:   #A67C52;
+    --cream-dim: #EDE7DC;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--cream);
+    color: var(--graphite);
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: var(--graphite);
+    color: var(--cream);
+    padding: 80px 48px 64px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23A67C52' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  .hero-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 5vw, 60px);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 20px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--terra);
+  }
+  .hero-sub {
+    font-size: 15px;
+    color: var(--stone);
+    max-width: 520px;
+    line-height: 1.6;
+  }
+
+  /* ─── NAV ─── */
+  .nav {
+    background: var(--graphite);
+    border-top: 1px solid rgba(166,124,82,0.2);
+    padding: 0 48px;
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav a {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--stone);
+    text-decoration: none;
+    padding: 16px 20px;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .nav a:hover { color: var(--cream); border-color: var(--terra); }
+
+  /* ─── LAYOUT ─── */
+  .container { max-width: 860px; margin: 0 auto; padding: 0 48px; }
+
+  section { padding: 72px 0; border-bottom: 1px solid var(--cream-dim); }
+  section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--copper);
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+    margin-bottom: 32px;
+  }
+
+  h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    margin-top: 40px;
+  }
+
+  p { margin-bottom: 16px; color: #3a3530; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ─── MODES GRID ─── */
+  .modes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 2px;
+    margin: 32px 0;
+    background: var(--cream-dim);
+    border: 1px solid var(--cream-dim);
+  }
+
+  .mode-card {
+    background: var(--cream);
+    padding: 24px 20px;
+    position: relative;
+  }
+
+  .mode-badge {
+    display: inline-block;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 2px;
+    margin-bottom: 12px;
+    font-family: 'Inter', sans-serif;
+  }
+  .mode-badge.concept { background: rgba(155,91,58,0.12); color: var(--terra); }
+  .mode-badge.precise { background: rgba(42,40,37,0.08); color: var(--graphite); }
+  .mode-badge.edit    { background: rgba(166,124,82,0.15); color: var(--copper); }
+  .mode-badge.final   { background: var(--graphite); color: var(--cream); }
+
+  .mode-card h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+  .mode-card p {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--stone);
+    margin-bottom: 16px;
+  }
+  .mode-stat {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--stone);
+    border-top: 1px solid var(--cream-dim);
+    padding-top: 12px;
+  }
+  .mode-stat strong { color: var(--graphite); }
+
+  /* ─── CODE BLOCK ─── */
+  .code-block {
+    background: var(--graphite);
+    color: #c9c3ba;
+    border-radius: 3px;
+    padding: 24px 28px;
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace;
+    font-size: 13px;
+    line-height: 1.7;
+    margin: 20px 0;
+    overflow-x: auto;
+  }
+  .code-block .comment { color: var(--stone); }
+  .code-block .flag    { color: var(--copper); }
+  .code-block .value   { color: #c4a882; }
+  .code-block .cmd     { color: #e8d5b7; }
+
+  /* ─── LEVELS ─── */
+  .level {
+    border-left: 3px solid var(--cream-dim);
+    padding-left: 28px;
+    margin-bottom: 48px;
+  }
+  .level.l1 { border-color: var(--stone); }
+  .level.l2 { border-color: var(--terra); }
+  .level.l3 { border-color: var(--copper); }
+
+  .level-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .level-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    line-height: 1;
+    color: var(--cream-dim);
+  }
+  .level.l1 .level-num { color: rgba(140,128,120,0.4); }
+  .level.l2 .level-num { color: rgba(155,91,58,0.3); }
+  .level.l3 .level-num { color: rgba(166,124,82,0.3); }
+
+  .level-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 500;
+  }
+  .level-tag {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--stone);
+  }
+
+  /* ─── EXPORT TABS ─── */
+  .tabs { margin: 24px 0; }
+  .tab-buttons {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 0;
+    background: var(--cream-dim);
+    padding: 2px;
+    border-radius: 3px 3px 0 0;
+    width: fit-content;
+  }
+  .tab-btn {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--stone);
+    border-radius: 2px;
+    transition: all 0.15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .tab-btn.active { background: var(--graphite); color: var(--cream); }
+  .tab-btn:hover:not(.active) { color: var(--graphite); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ─── STEPS ─── */
+  .steps { counter-reset: step; margin: 20px 0; }
+  .step {
+    counter-increment: step;
+    padding: 20px 20px 20px 64px;
+    position: relative;
+    border-bottom: 1px solid var(--cream-dim);
+  }
+  .step:last-child { border-bottom: none; }
+  .step::before {
+    content: counter(step);
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--copper);
+    line-height: 1;
+  }
+  .step strong {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: var(--graphite);
+  }
+  .step p { font-size: 14px; color: var(--stone); margin: 0; }
+
+  /* ─── VOCAB TABLE ─── */
+  .vocab {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 14px;
+  }
+  .vocab th {
+    background: var(--graphite);
+    color: var(--cream);
+    padding: 10px 16px;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .vocab td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--cream-dim);
+    vertical-align: top;
+  }
+  .vocab tr:hover td { background: rgba(166,124,82,0.04); }
+  .vocab td:first-child { color: var(--stone); font-style: italic; width: 22%; }
+  .vocab td:last-child { font-family: 'SF Mono', monospace; font-size: 12px; color: var(--terra); }
+
+  /* ─── SCENARIOS ─── */
+  .scenario {
+    background: var(--graphite);
+    color: var(--cream);
+    padding: 32px 36px;
+    margin-bottom: 16px;
+    border-radius: 2px;
+  }
+  .scenario h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 20px;
+    color: var(--cream);
+  }
+  .scenario-steps { counter-reset: sc; }
+  .scenario-step {
+    counter-increment: sc;
+    display: flex;
+    gap: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 14px;
+    line-height: 1.5;
+    color: #c9c3ba;
+  }
+  .scenario-step:last-child { border-bottom: none; }
+  .scenario-step::before {
+    content: counter(sc);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    color: var(--copper);
+    flex-shrink: 0;
+    width: 20px;
+  }
+  .scenario-step strong { color: var(--cream); }
+
+  /* ─── TIPS ─── */
+  .tip-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .tip {
+    padding: 20px 24px;
+    border-radius: 2px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .tip.good { background: rgba(155,91,58,0.08); border-left: 3px solid var(--terra); }
+  .tip.bad  { background: rgba(140,128,120,0.08); border-left: 3px solid var(--stone); }
+  .tip-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .tip.good .tip-label { color: var(--terra); }
+  .tip.bad  .tip-label { color: var(--stone); }
+  .tip ul { list-style: none; }
+  .tip ul li { padding: 5px 0; border-bottom: 1px solid rgba(0,0,0,0.04); }
+  .tip ul li:last-child { border-bottom: none; }
+  .tip ul li::before { content: '— '; opacity: 0.4; }
+
+  /* ─── HOW TO OPEN ─── */
+  .how-card {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    padding: 24px 28px;
+    background: white;
+    border: 1px solid var(--cream-dim);
+    margin-bottom: 12px;
+    border-radius: 2px;
+  }
+  .how-icon {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 36px;
+    line-height: 1;
+    color: var(--copper);
+    flex-shrink: 0;
+    width: 44px;
+    text-align: center;
+  }
+  .how-card h4 {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--graphite);
+  }
+  .how-card p { font-size: 13px; color: var(--stone); margin: 0; }
+  .how-card code {
+    display: inline-block;
+    background: var(--cream-dim);
+    padding: 2px 7px;
+    border-radius: 2px;
+    font-family: monospace;
+    font-size: 12px;
+    color: var(--terra);
+    margin-top: 6px;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--graphite);
+    color: var(--stone);
+    padding: 48px;
+    text-align: center;
+    font-size: 13px;
+  }
+  footer strong { color: var(--cream); }
+
+  @media (max-width: 600px) {
+    .hero, .container { padding-left: 24px; padding-right: 24px; }
+    .nav { padding: 0 24px; }
+    .tip-grid { grid-template-columns: 1fr; }
+    .modes-grid { grid-template-columns: 1fr; }
+    footer { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="container">
+    <p class="hero-label">Folk Studio — AI Visualizer</p>
+    <h1>Как подавать<br>материалы для<br><em>максимального</em> результата</h1>
+    <p class="hero-sub">Гайд для архитектора. Четыре режима рендера, экспорт из SketchUp и ArchiCAD, словарь точных описаний, сценарии для реальных задач.</p>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div style="display:flex; gap:0; max-width:860px; margin:0 auto;">
+    <a href="#open">Как открыть</a>
+    <a href="#modes">Режимы</a>
+    <a href="#levels">Уровни подачи</a>
+    <a href="#export">Экспорт</a>
+    <a href="#vocab">Словарь</a>
+    <a href="#iterate">Правки</a>
+    <a href="#scenarios">Сценарии</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<!-- КАК ОТКРЫТЬ -->
+<section id="open">
+  <p class="section-label">Навигация</p>
+  <h2>Как читать этот гайд</h2>
+  <p>Файл лежит в офисе и доступен тремя способами:</p>
+
+  <div class="how-card">
+    <div class="how-icon">①</div>
+    <div>
+      <h4>Открыть в браузере напрямую</h4>
+      <p>Найди файл в проводнике и двойной клик — откроется в Chrome/Edge.<br>
+      Путь:</p>
+      <code>office/agents/visualizer/knowledge/source-prep-guide.html</code>
+    </div>
+  </div>
+
+  <div class="how-card">
+    <div class="how-icon">②</div>
+    <div>
+      <h4>Через VS Code Preview</h4>
+      <p>Открой файл в VS Code → правая кнопка → <em>Open with Live Preview</em> (или кнопка в правом верхнем углу). Видишь сразу рядом с кодом.</p>
+    </div>
+  </div>
+
+  <div class="how-card">
+    <div class="how-icon">③</div>
+    <div>
+      <h4>Спросить агента в чате</h4>
+      <p>Напиши просто: <em>«открой гайд по подготовке материалов»</em> — агент прочитает и ответит на конкретный вопрос без открытия браузера.</p>
+    </div>
+  </div>
+</section>
+
+<!-- РЕЖИМЫ -->
+<section id="modes">
+  <p class="section-label">Инструмент</p>
+  <h2>Четыре режима рендера</h2>
+  <p>Агент выбирает режим автоматически по задаче. Ты можешь указать явно.</p>
+
+  <div class="modes-grid">
+    <div class="mode-card">
+      <span class="mode-badge concept">concept</span>
+      <h4>Концепт</h4>
+      <p>Быстрые атмосферы из текста. Для поиска направления и первого разговора с клиентом.</p>
+      <div class="mode-stat">⏱ <strong>30 сек</strong> · дёшево · геометрия случайная</div>
+    </div>
+    <div class="mode-card">
+      <span class="mode-badge precise">precise</span>
+      <h4>Точный</h4>
+      <p>SketchUp / ArchiCAD экспорт → фотореализм. Геометрия сохраняется. Главный рабочий режим.</p>
+      <div class="mode-stat">⏱ <strong>40–60 сек</strong> · средне · геометрия твоя</div>
+    </div>
+    <div class="mode-card">
+      <span class="mode-badge edit">edit</span>
+      <h4>Правка</h4>
+      <p>Меняет один элемент в готовом рендере. «Сделай стену из дуба» — и только стена меняется.</p>
+      <div class="mode-stat">⏱ <strong>5–10 сек</strong> · дёшево · точечно</div>
+    </div>
+    <div class="mode-card">
+      <span class="mode-badge final">final</span>
+      <h4>Финал</h4>
+      <p>4K для клиентской презентации и Behance. Запускается последним, один вариант.</p>
+      <div class="mode-stat">⏱ <strong>2–3 мин</strong> · дороже · максимум</div>
+    </div>
+  </div>
+
+  <p style="font-size:14px; color:var(--stone);">
+    Типичный цикл: <strong style="color:var(--graphite);">concept → precise → edit → final</strong><br>
+    Для срочной задачи: <strong style="color:var(--graphite);">precise → edit → final</strong>
+  </p>
+</section>
+
+<!-- УРОВНИ ПОДАЧИ -->
+<section id="levels">
+  <p class="section-label">Что ты даёшь агенту</p>
+  <h2>Три уровня подготовки</h2>
+
+  <div class="level l1">
+    <div class="level-header">
+      <span class="level-num">01</span>
+      <div>
+        <div class="level-title">Только текст</div>
+        <div class="level-tag">concept mode · атмосфера за 30 сек</div>
+      </div>
+    </div>
+    <p>Когда нет модели или нужно быстро найти направление для клиента. Пишешь агенту:</p>
+    <div class="code-block">
+<span class="comment"># Что написать агенту</span>
+<span class="cmd">Нужна визуализация для</span> <span class="value">[жилое / ресторан / спа]</span>
+
+Клиент: <span class="value">[семья / молодая пара / ресторатор]</span>
+Ощущение: <span class="value">[3 слова — тёплое, тихое, природное]</span>
+Материалы точно будут: <span class="value">[дуб / штукатурка / терракота]</span>
+Свет: <span class="value">[утро / вечер / рассеянный]</span>
+    </div>
+    <p style="font-size:13px; color:var(--stone);">Результат: 3 варианта атмосферы. Геометрия генерируется случайно — это нормально для поиска направления.</p>
+  </div>
+
+  <div class="level l2">
+    <div class="level-header">
+      <span class="level-num">02</span>
+      <div>
+        <div class="level-title">Экспорт из программы</div>
+        <div class="level-tag">precise mode · твоя геометрия сохранена</div>
+      </div>
+    </div>
+    <p>Основной рабочий режим. Агент получает твою реальную геометрию и одевает её в стиль.</p>
+    <p>Напиши агенту вместе с файлом:</p>
+    <div class="code-block">
+<span class="comment"># Прикрепи файл + напиши это</span>
+Вот экспорт из <span class="value">[SketchUp / ArchiCAD]</span>: <span class="flag">[файл]</span>
+
+Тип: <span class="value">[жилое / ресторан / реставрация]</span>
+Стиль: <span class="value">[Japandi / Wabi-sabi / Скандинавский]</span>
+Пол: <span class="value">[дубовый паркет ёлочкой 70мм]</span>
+Стены: <span class="value">[известковая штукатурка, тёплый тон]</span>
+Свет: <span class="value">[натуральный, утро 9:00 через высокие окна]</span>
+Атмосфера: <span class="value">[тихая / оживлённая / торжественная]</span>
+    </div>
+    <p style="font-size:13px; color:var(--stone);">Для максимального контроля — два экспорта из одного вьюпорта (см. раздел «Экспорт»). Тогда стены, углы и проёмы сохраняются точно.</p>
+  </div>
+
+  <div class="level l3">
+    <div class="level-header">
+      <span class="level-num">03</span>
+      <div>
+        <div class="level-title">Правка конкретного элемента</div>
+        <div class="level-tag">edit mode · один элемент за 5 секунд</div>
+      </div>
+    </div>
+    <p>Есть готовый рендер, нужно поменять что-то одно. Прикрепи рендер и напиши:</p>
+    <div class="code-block">
+<span class="comment"># Одна команда = одно изменение</span>
+<span class="cmd">"Замени напольное покрытие на белый мрамор с серыми прожилками"</span>
+<span class="cmd">"Сделай левую стену из тёмного дуба вместо штукатурки"</span>
+<span class="cmd">"Поменяй на вечернее освещение, добавь тёплые подвесные лампы"</span>
+<span class="cmd">"Убери людей из кадра"</span>
+<span class="cmd">"Добавь живые растения в углу слева"</span>
+    </div>
+    <p style="font-size:13px; color:var(--stone);">Не "поменяй пол, стены и свет" — это три отдельных запроса. Одна команда, один элемент — самый быстрый результат.</p>
+  </div>
+</section>
+
+<!-- ЭКСПОРТ -->
+<section id="export">
+  <p class="section-label">Технический раздел</p>
+  <h2>Экспорт из SketchUp и ArchiCAD</h2>
+
+  <div class="tabs">
+    <div class="tab-buttons">
+      <button class="tab-btn active" onclick="showTab('sketchup', this)">SketchUp</button>
+      <button class="tab-btn" onclick="showTab('archicad', this)">ArchiCAD</button>
+    </div>
+
+    <!-- SKETCHUP -->
+    <div id="tab-sketchup" class="tab-content active" style="background:white; border:1px solid var(--cream-dim); padding:32px;">
+      <h3 style="margin-top:0;">Вариант A — один экспорт (быстро)</h3>
+      <p style="font-size:14px; color:var(--stone);">Геометрия сохраняется на ~70%. Достаточно для большинства задач.</p>
+      <div class="steps">
+        <div class="step">
+          <strong>Выбери стиль: Monochrome</strong>
+          <p>View → Styles → Monochrome. Белая модель без текстур и цветов.</p>
+        </div>
+        <div class="step">
+          <strong>Включи тени</strong>
+          <p>View → Shadows → включить. Солнце на 10-14:00, средняя яркость.</p>
+        </div>
+        <div class="step">
+          <strong>Настрой вьюпорт</strong>
+          <p>Угол камеры, перспектива. Это и будет финальный кадр рендера.</p>
+        </div>
+        <div class="step">
+          <strong>Экспортируй</strong>
+          <p>File → Export → 2D Graphic → JPG. Разрешение: 1920×1080 минимум. Сохрани как <code style="background:var(--cream-dim);padding:1px 5px;border-radius:2px;font-size:12px;">sketchup_mono.jpg</code></p>
+        </div>
+      </div>
+
+      <h3>Вариант B — два экспорта (максимальный контроль)</h3>
+      <p style="font-size:14px; color:var(--stone);">Точная фиксация рёбер через ControlNet. Стены, углы, проёмы — как в модели.</p>
+      <div class="steps">
+        <div class="step">
+          <strong>Настрой вьюпорт один раз — не трогай до конца</strong>
+          <p>Оба экспорта должны быть с одной камеры, одинаковое разрешение.</p>
+        </div>
+        <div class="step">
+          <strong>Экспорт 1 — Depth source</strong>
+          <p>Стиль: Monochrome + включи Fog (View → Fog). Туман создаёт глубину. Сохрани как <code style="background:var(--cream-dim);padding:1px 5px;border-radius:2px;font-size:12px;">sketchup_depth.jpg</code></p>
+        </div>
+        <div class="step">
+          <strong>Экспорт 2 — Lineart (рёбра)</strong>
+          <p>Стиль: Hidden Line (белый фон, только чёрные линии, без заливки). Тот же вьюпорт, та же камера. Сохрани как <code style="background:var(--cream-dim);padding:1px 5px;border-radius:2px;font-size:12px;">sketchup_lineart.jpg</code></p>
+        </div>
+        <div class="step">
+          <strong>Передай агенту оба файла</strong>
+          <p>Прикрепи оба изображения. Напиши: «вот depth и lineart из SketchUp». Агент сам применит ControlNet.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARCHICAD -->
+    <div id="tab-archicad" class="tab-content" style="background:white; border:1px solid var(--cream-dim); padding:32px;">
+      <h3 style="margin-top:0;">ArchiCAD → точный рендер</h3>
+      <p style="font-size:14px; color:var(--stone);">ArchiCAD даёт более точную геометрию чем SketchUp. Два пути в зависимости от того что есть.</p>
+
+      <h3>Путь 1 — из 3D-окна (быстро)</h3>
+      <div class="steps">
+        <div class="step">
+          <strong>Открой 3D-окно</strong>
+          <p>Window → 3D. Выбери нужный вид камерой или через Orbit.</p>
+        </div>
+        <div class="step">
+          <strong>Переключись в Wireframe или Hidden Line</strong>
+          <p>View → 3D View Mode → Hidden Line (скрытые линии). Белая модель, без материалов.</p>
+        </div>
+        <div class="step">
+          <strong>Сохрани вид</strong>
+          <p>File → Save as → PNG/JPG. Разрешение: установи в параметрах сохранения 1920×1080+. Сохрани как <code style="background:var(--cream-dim);padding:1px 5px;border-radius:2px;font-size:12px;">archicad_wire.jpg</code></p>
+        </div>
+        <div class="step">
+          <strong>Передай агенту</strong>
+          <p>Этот файл идёт как <strong>--image</strong> в precise mode. Сила трансформации: 0.60–0.70 (геометрия сохраняется жёстко).</p>
+        </div>
+      </div>
+
+      <h3>Путь 2 — через Cinema 4D / BIMx (для двух экспортов)</h3>
+      <p style="font-size:14px; color:var(--stone);">Если нужен максимальный контроль геометрии как в SketchUp Вариант B:</p>
+      <div class="steps">
+        <div class="step">
+          <strong>Экспортируй OBJ/FBX из ArchiCAD</strong>
+          <p>File → Save as → 3D Model Files → OBJ или FBX. Без текстур (Only Surfaces).</p>
+        </div>
+        <div class="step">
+          <strong>Импортируй в Blender (бесплатно)</strong>
+          <p>File → Import → OBJ. Настрой камеру как в ArchiCAD (тот же угол).</p>
+        </div>
+        <div class="step">
+          <strong>Рендер Depth map</strong>
+          <p>В Blender: Cycles, добавить Depth Pass в Compositor → сохрани как <code style="background:var(--cream-dim);padding:1px 5px;border-radius:2px;font-size:12px;">depth.jpg</code></p>
+        </div>
+        <div class="step">
+          <strong>Рендер Edge/Lineart</strong>
+          <p>Freestyle renderer в Blender → только рёбра, белый фон → сохрани как <code style="background:var(--cream-dim);padding:1px 5px;border-radius:2px;font-size:12px;">lineart.jpg</code></p>
+        </div>
+        <div class="step">
+          <strong>Передай агенту оба файла</strong>
+          <p>Так же как SketchUp Вариант B: depth + lineart, precise mode.</p>
+        </div>
+      </div>
+
+      <div style="background:rgba(155,91,58,0.08); border-left:3px solid var(--terra); padding:16px 20px; margin-top:24px; font-size:14px;">
+        <strong>Самый простой путь для ArchiCAD:</strong> 3D окно → Hidden Line → JPG экспорт. Геометрия сохранится на 65–75%, чего достаточно для большинства задач. Путь через Blender — когда нужна точность «как в портфолио».
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- СЛОВАРЬ -->
+<section id="vocab">
+  <p class="section-label">Язык материалов</p>
+  <h2>Словарь точных описаний</h2>
+  <p>Агент передаёт твои слова напрямую в промт. Конкретика — это качество рендера.</p>
+
+  <table class="vocab">
+    <thead>
+      <tr>
+        <th>Общее слово</th>
+        <th>Точное описание для агента</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>«дерево»</td>
+        <td>natural oak herringbone parquet 70mm · dark walnut vertical cladding · reclaimed pine boards rough-sawn · white ash tongue-and-groove</td>
+      </tr>
+      <tr>
+        <td>«камень»</td>
+        <td>travertine tiles warm beige vein-cut · black slate honed surface · limestone rough-cut cladding · grey basalt cobblestone</td>
+      </tr>
+      <tr>
+        <td>«штукатурка»</td>
+        <td>tadelakt plaster warm sand tone · lime wash white brushed · exposed concrete formwork texture grey · microcement polished warm grey</td>
+      </tr>
+      <tr>
+        <td>«металл»</td>
+        <td>aged brass patina · blackened steel matte · brushed copper warm · oxidized corten steel weathered</td>
+      </tr>
+      <tr>
+        <td>«тёплый свет»</td>
+        <td>warm amber afternoon light 16:00, long shadows, golden hour · soft evening glow, pendant warm 2700K, pools of light</td>
+      </tr>
+      <tr>
+        <td>«уютно»</td>
+        <td>inhabited warmth, layered linen textiles, soft diffused shadows, fresh flowers on table, trace of human presence</td>
+      </tr>
+      <tr>
+        <td>«современно»</td>
+        <td>(не используй) → лучше: clean lines, essential elements only, negative space, no ornament</td>
+      </tr>
+      <tr>
+        <td>«красиво»</td>
+        <td>(не используй) → лучше: дай три прилагательных — тёплое, тихое, основательное</td>
+      </tr>
+      <tr>
+        <td>«стекло»</td>
+        <td>floor-to-ceiling glazing, clear glass · frosted glass partition diffused · antique mirror glass warm</td>
+      </tr>
+      <tr>
+        <td>«ткани»</td>
+        <td>natural linen curtains · undyed wool bouclé · heavy cotton slipcover · mohair velvet cushions deep teal</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ПРАВКИ -->
+<section id="iterate">
+  <p class="section-label">Диалог с агентом</p>
+  <h2>Как давать правки</h2>
+  <p>После первых рендеров агент покажет варианты А / Б / В. Идеальная правка:</p>
+  <div style="background:var(--graphite); color:var(--cream); padding:20px 28px; border-radius:2px; font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:400; line-height:1.4; margin:24px 0;">
+    «Нравится <em style="color:var(--terra);">[что конкретно]</em> + хочу изменить <em style="color:var(--copper);">[что конкретно]</em>»
+  </div>
+
+  <div class="tip-grid">
+    <div class="tip good">
+      <span class="tip-label">Работает</span>
+      <ul>
+        <li>«Вариант Б, но теплее и без людей»</li>
+        <li>«Пол как в Б, свет как в А»</li>
+        <li>«Тот же, но добавь ощущение высоты»</li>
+        <li>«Более реалистично, больше деталей»</li>
+        <li>«Сохрани геометрию жёстче»</li>
+      </ul>
+    </div>
+    <div class="tip bad">
+      <span class="tip-label">Не работает</span>
+      <ul>
+        <li>«Сделай красивее» — нет критерия</li>
+        <li>«Переделай полностью» → новый concept</li>
+        <li>«Как у Zaha Hadid» → дай картинку</li>
+        <li>«Поменяй пол, стены и свет» → 3 запроса</li>
+        <li>«Мне не нравится» — что именно?</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Быстрые модификаторы</h3>
+  <table class="vocab">
+    <thead><tr><th>Хочешь</th><th>Пишешь агенту</th></tr></thead>
+    <tbody>
+      <tr><td>Теплее</td><td>«добавь тепла» → warm amber tones, honey-colored light</td></tr>
+      <tr><td>Холоднее</td><td>«холоднее» → cool north light, silver tones, morning clarity</td></tr>
+      <tr><td>Минималистичнее</td><td>«меньше всего» → essential elements only, negative space</td></tr>
+      <tr><td>Уютнее</td><td>«уютнее» → layered textiles, soft shadows, inhabited warmth</td></tr>
+      <tr><td>Сохранить геометрию</td><td>«держи геометрию жёстче» → strength 0.55–0.60</td></tr>
+      <tr><td>Сменить стиль полностью</td><td>«кардинально другое» → strength 0.85+</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- СЦЕНАРИИ -->
+<section id="scenarios">
+  <p class="section-label">Практика</p>
+  <h2>Сценарии для Folk Studio</h2>
+
+  <div class="scenario">
+    <h4>Клиент приходит завтра — нужно показать варианты</h4>
+    <div class="scenario-steps">
+      <div class="scenario-step"><span><strong>concept mode</strong> из текста — 3 атмосферы за 90 сек</span></div>
+      <div class="scenario-step"><span>Клиент выбирает направление на первой встрече</span></div>
+      <div class="scenario-step"><span><strong>precise mode</strong> с SketchUp/ArchiCAD экспортом — 3 варианта с геометрией</span></div>
+      <div class="scenario-step"><span><strong>edit mode</strong> — точечные правки по замечаниям клиента (5 сек/правка)</span></div>
+      <div class="scenario-step"><span><strong>final mode</strong> — 4K для финального показа и согласования</span></div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <h4>Один проект — три стиля для Behance</h4>
+    <div class="scenario-steps">
+      <div class="scenario-step"><span>Экспортируй фасад из SketchUp: Monochrome с тенями</span></div>
+      <div class="scenario-step"><span><strong>precise mode</strong>: «жилой фасад, дерево + белая штукатурка, вечер, скандинавский»</span></div>
+      <div class="scenario-step"><span><strong>precise mode</strong>: «тот же фасад, тёмный кирпич, урбанистика, индустриальный»</span></div>
+      <div class="scenario-step"><span><strong>precise mode</strong>: «фасад, известняк + медь, средиземноморский, полдень»</span></div>
+      <div class="scenario-step"><span>Три стилевых направления одного объекта → Behance серия</span></div>
+    </div>
+  </div>
+
+  <div class="scenario">
+    <h4>Концепт для клиента — ресторан + спа</h4>
+    <div class="scenario-steps">
+      <div class="scenario-step"><span><strong>concept mode</strong>: «ресторан авторской кухни, [регион], тёплый, wabi-sabi, кирпич и дерево» — до первого разговора с клиентом</span></div>
+      <div class="scenario-step"><span>Созвон с клиентом — уточняем материалы, ощущение, площадь</span></div>
+      <div class="scenario-step"><span><strong>precise mode</strong> — если есть хоть приблизительный план помещения</span></div>
+      <div class="scenario-step"><span><strong>final mode</strong> — финальный рендер как часть КП</span></div>
+    </div>
+  </div>
+</section>
+
+</div><!-- /container -->
+
+<footer>
+  <strong>Folk Studio</strong> — Архитектура и Дизайн<br>
+  <span style="margin-top:8px; display:block;">AI Visualizer Guide · апрель 2026</span>
+</footer>
+
+<script>
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+
+</body>
+</html>

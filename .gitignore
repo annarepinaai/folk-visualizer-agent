@@ -1,0 +1,11 @@
+.env
+.env.*
+output/
+__pycache__/
+*.pyc
+*.pyo
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
