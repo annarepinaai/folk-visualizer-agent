@@ -143,23 +143,25 @@ python scripts/viz_render.py --mode gpt --count 2 \
 
 Агент работает из коробки, но становится мощнее с MCP-серверами.
 
-**Минимальный апгрейд (10 минут):**
+**Всё уже описано в `.mcp.json` — скопируй в корень, подставь ключи, перезапусти Claude.**
+
+| Сервер | Что даёт |
+|--------|----------|
+| `fal-ai` (hosted) | Доступ к 1000+ моделям каталога, агент сам выбирает лучшую |
+| `fal-local` | Авто-скачивание рендеров в `output/renders/`, авто-открытие |
+| `image-viewer` | Рендеры показываются прямо в чате без файлового менеджера |
+| `higgsfield` | Видео из рендеров — Sora 2, Veo 3.1, Kling 3.0 (flythrough за 15 сек) |
 
 ```bash
-# 1. Официальный fal MCP — агент сам выбирает лучшую модель из 1000+ каталога
+# Установка за 2 минуты
+npm install -g image-viewer-mcp
+npm install fal-image-video-mcp
 claude mcp add --transport http fal-ai https://mcp.fal.ai/mcp \
   --header "Authorization: Bearer YOUR_FAL_KEY"
-
-# 2. Показывает рендеры прямо в чате
-npm install -g image-viewer-mcp
+# Добавь FAL_KEY (и опционально HIGGSFIELD_KEY) в .env → перезапусти Claude
 ```
 
-**Стратегически:**
-- `tapir-archicad-MCP` — прямой доступ к открытой модели ArchiCAD (читает геометрию, материалы без ручного экспорта)
-- `SketchUp Connector` — официальный MCP от Trimble для `.skp`-файлов (апрель 2026)
-- `Higgsfield MCP` — видео из рендера: Sora 2, Veo 3.1, Kling 3.0 (flythrough-презентации клиентам)
-
-Полный гайд с установкой → [agent/knowledge/mcp-integrations.md](agent/knowledge/mcp-integrations.md)
+Подробный гайд → [agent/knowledge/mcp-integrations.md](agent/knowledge/mcp-integrations.md)
 
 ---
 

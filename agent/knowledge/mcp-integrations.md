@@ -1,92 +1,85 @@
 # MCP-интеграции для визуализатора
 
-Список проверенных MCP-серверов и скиллов, которые усиляют агента.
-Разбиты по приоритету — от "поставь сразу" до "стратегически".
+Все четыре сервера уже описаны в `.mcp.json` — скопируй его в корень проекта и подставь ключи.
 
 ---
 
-## Приоритет 1 — Поставь сразу (быстрый результат)
+## 1. Официальный fal MCP — динамический выбор модели
 
-### Официальный fal MCP Server
-**GitHub / Docs:** https://fal.ai/docs/documentation/setting-up/mcp  
-**Что даёт:** 9 инструментов — поиск по 1000+ моделям каталога, запуск любой модели, проверка цен, схемы параметров. Агент сам выбирает оптимальную модель по описанию задачи вместо хардкодированных режимов.
+**Docs:** https://fal.ai/docs/documentation/setting-up/mcp  
+**Blog:** https://blog.fal.ai/connect-your-ai-to-1-000-models-with-the-fal-mcp-server/
 
-**Установка (одна команда):**
+**Что даёт:** 9 инструментов — поиск по 1000+ моделям каталога, запуск любой модели, проверка цен, схемы параметров. Агент сам выбирает лучшую модель по описанию задачи вместо хардкодированных режимов.
+
+**Установка:**
 ```bash
-claude mcp add --transport http fal-ai https://mcp.fal.ai/mcp --header "Authorization: Bearer YOUR_FAL_KEY"
+claude mcp add --transport http fal-ai https://mcp.fal.ai/mcp \
+  --header "Authorization: Bearer YOUR_FAL_KEY"
 ```
 
-**Что меняется в агенте:** вместо `--mode gpt` / `--mode concept` агент запрашивает `recommend_model("photorealistic interior from ArchiCAD")` и получает актуальную лучшую модель из каталога. Никаких ручных обновлений при выходе новых моделей.
+**Что меняется:** вместо `--mode gpt` / `--mode concept` агент запрашивает актуальную лучшую модель из каталога. При выходе новых моделей — обновление автоматически, без правки кода.
 
 ---
 
-### image-viewer-mcp (показывает рендеры прямо в чате)
-**GitHub:** https://github.com/itrimble/image-viewer-mcp  
-**Что даёт:** Отображает локальные файлы (JPG, PNG, WebP, SVG) inline прямо в разговоре с Claude. Если терминал поддерживает Kitty/Ghostty — картинка в чате. Если нет — кликабельный путь.
+## 2. image-viewer-mcp — рендеры прямо в чате
+
+**GitHub:** https://github.com/itrimble/image-viewer-mcp
+
+**Что даёт:** Отображает локальные файлы (JPG, PNG, WebP, SVG) inline в разговоре с Claude. Если терминал поддерживает Kitty/Ghostty — картинка в чате. Если нет — кликабельный путь.
 
 **Установка:**
 ```bash
 npm install -g image-viewer-mcp
-# Добавить в .claude/settings.json:
-# "mcpServers": { "image-viewer": { "command": "image-viewer-mcp" } }
 ```
 
-**Что меняется:** после каждой генерации агент сразу показывает результат без переключения в файловый менеджер. Итерация вдвое быстрее.
+Добавить в `.mcp.json` — уже есть.
+
+**Что меняется:** после генерации агент сразу показывает результат без переключения в файловый менеджер. Итерация быстрее.
 
 ---
 
-### RamboRogers fal-image-video-mcp (авто-скачивание + авто-открытие)
-**GitHub:** https://github.com/RamboRogers/fal-image-video-mcp  
-**Что даёт:** Скачивает все результаты напрямую в `DOWNLOAD_PATH`, `AUTOOPEN: true` открывает результат в системном просмотрщике сразу после генерации. Инструмент `execute_custom_model` запускает любой fal-эндпоинт.
+## 3. RamboRogers fal-image-video-mcp — авто-скачивание и авто-открытие
 
-**Конфиг:**
+**GitHub:** https://github.com/RamboRogers/fal-image-video-mcp
+
+**Что даёт:**
+- Скачивает все результаты напрямую в `DOWNLOAD_PATH`
+- `AUTOOPEN: true` — открывает результат в системном просмотрщике сразу после генерации
+- `execute_custom_model` — запускает любой fal-эндпоинт за пределами встроенного реестра
+
+**Установка:**
+```bash
+npm install fal-image-video-mcp
+```
+
+Конфиг уже в `.mcp.json`:
 ```json
-{
-  "FAL_KEY": "ваш_ключ",
-  "DOWNLOAD_PATH": "output/renders/",
-  "AUTOOPEN": "true"
+"fal-local": {
+  "env": {
+    "FAL_KEY": "${FAL_KEY}",
+    "DOWNLOAD_PATH": "output/renders/",
+    "AUTOOPEN": "true"
+  }
 }
 ```
 
-**Что меняется:** рендеры автоматически идут в папку проекта и сразу открываются. Убирает ручной шаг.
+**Что меняется:** рендеры автоматически идут в папку проекта и сразу открываются. Ноль ручных шагов после генерации.
 
 ---
 
-## Приоритет 2 — Меняет базовый workflow
+## 4. Higgsfield MCP — видео из рендеров
 
-### tapir-archicad-MCP (прямой доступ к открытой модели ArchiCAD)
-**GitHub:** https://github.com/SzamosiMate/tapir-archicad-MCP  
-**Оригинал:** https://github.com/lgradisar/archicad-mcp  
-**Требования:** ArchiCAD 27+, Tapir add-on, Python 3.12+, Claude Desktop 0.9+
-
-**Что даёт:** Claude напрямую работает с открытой моделью в ArchiCAD — читает материалы, геометрию, ориентации стен, находит конкретные элементы ("все окна с южной ориентацией"). Семантический поиск по элементам модели.
-
-**Что меняется в workflow:**
-```
-СЕЙЧАС: архитектор вручную экспортирует JPG → описывает материалы → агент угадывает
-БУДЕТ:  агент читает ArchiCAD напрямую → сам извлекает материалы → строит точный промпт
-```
-
-Шаг ANALYZE в алгоритме становится автоматическим.
-
----
-
-### SketchUp Connector for Claude (официальный от Trimble, апрель 2026)
-**Анонс:** https://news.trimble.com/2026-04-28-Trimble-Links-SketchUp-with-Anthropics-Claude  
-**Что даёт:** Официальный MCP-коннектор от Trimble. Claude читает `.skp`-файлы, видит геометрию, создаёт объекты по описанию, экспортирует превью. Включается в настройках Claude через MCP-директорию.
-
-**Что меняется:** файл `.skp` вместо PNG-экспорта. Агент видит настоящую геометрию, не картинку. Точнее ставит промпт — меньше итераций.
-
----
-
-## Приоритет 3 — Следующий уровень
-
-### Higgsfield MCP (видео из рендеров: Sora 2, Veo 3.1, Kling 3.0)
 **Сайт:** https://higgsfield.ai/mcp  
-**Эндпоинт:** `https://mcp.higgsfield.ai`  
-**Что даёт:** 30+ видео-моделей через один hosted MCP. Sora 2, Veo 3.1, Kling 3.0, Wan 2.6. Видео до 15 секунд, до 4K. Авторизация через Higgsfield-аккаунт — без отдельных API-ключей.
+**Гайд:** https://mcp.directory/blog/higgsfield-mcp-guide  
+**Эндпоинт:** `https://mcp.higgsfield.ai`
 
-**Что добавляет:** режим `/viz --video` — из готового рендера делает flythrough-видео для презентации клиенту. Архитектурное видео за 15 секунд. Ценность: показать клиенту пространство в движении, не стоп-кадр.
+**Что даёт:** 30+ видео-моделей через один hosted MCP:
+- **Sora 2** — лучшее качество движения
+- **Veo 3.1** — реалистичная физика
+- **Kling 3.0** — быстро и дёшево
+- Wan 2.6, Seedance 2.0, MiniMax Hailuo, Soul Cinema
+
+Видео до 15 секунд, до 4K. Авторизация через Higgsfield-аккаунт.
 
 **Установка:**
 ```bash
@@ -94,42 +87,46 @@ claude mcp add --transport http higgsfield https://mcp.higgsfield.ai \
   --header "Authorization: Bearer YOUR_HIGGSFIELD_KEY"
 ```
 
+Или через `.mcp.json` — уже есть.
+
+**Зарегистрироваться:** https://higgsfield.ai — получи ключ, добавь в `.env` как `HIGGSFIELD_KEY`.
+
+**Что добавляет:** из готового рендера — flythrough-видео для презентации клиенту. Архитектурное видео за 15 секунд без съёмочной группы.
+
+**Пример запроса к агенту:**
+```
+Сделай видео из этого рендера — медленный облёт слева направо, 8 секунд
+```
+
 ---
 
-## Полезные скиллы-коллекции (референсы)
+## Быстрый старт (всё сразу)
 
-### AlpacaLabsLLC/skills-for-architects
-**GitHub:** https://github.com/AlpacaLabsLLC/skills-for-architects  
-**Что есть:** 37 скиллов для архитекторов. Из интересного: `product-and-materials-researcher` (5 скиллов) — ищет референсы материалов с реальными спецификациями. Можно адаптировать в `/viz-materials` — агент сам ищет правильные описания для промпта (тип дерева, камня, штукатурки).
+```bash
+# 1. Скопируй .mcp.json в корень проекта (уже в репо)
 
-### imsaif/design-with-claude
-**GitHub:** https://github.com/imsaif/design-with-claude  
-**Что есть:** 37 дизайн-специалистов как Claude Code агенты. `color-specialist` — подбирает точные hex-коды. Полезно для финального промпта когда нужна конкретика цвета материала.
+# 2. Установи npm-пакеты
+npm install -g image-viewer-mcp
+npm install fal-image-video-mcp
+
+# 3. Добавь ключи в .env
+FAL_KEY=ваш_ключ
+HIGGSFIELD_KEY=ваш_ключ  # опционально, для видео
+
+# 4. Добавь fal MCP в Claude
+claude mcp add --transport http fal-ai https://mcp.fal.ai/mcp \
+  --header "Authorization: Bearer $FAL_KEY"
+
+# 5. Перезапусти Claude Code — все серверы подключатся автоматически
+```
 
 ---
 
 ## Каталоги для мониторинга
 
-| Ресурс | URL | Что смотреть |
-|--------|-----|-------------|
-| awesome-claude-code-toolkit | https://github.com/rohitg00/awesome-claude-code-toolkit | 135+ агентов, раздел image/design |
-| awesome-agent-skills | https://github.com/VoltAgent/awesome-agent-skills | 1000+ скиллов |
-| mcpcat.io | https://mcpcat.io/guides/best-mcp-servers-for-claude-code/ | Рейтинг MCP по категориям |
-
----
-
-## Что добавить первым (рекомендация)
-
-```
-День 1 (5 минут):
-  claude mcp add --transport http fal-ai https://mcp.fal.ai/mcp \
-    --header "Authorization: Bearer $FAL_KEY"
-
-День 1 (+ 5 минут):
-  npm install -g image-viewer-mcp
-  → рендеры видны прямо в чате
-
-Следующий шаг:
-  archicad-mcp / tapir — если ArchiCAD 27+
-  Higgsfield MCP — когда нужны видео-презентации
-```
+| Ресурс | URL |
+|--------|-----|
+| awesome-claude-code-toolkit | https://github.com/rohitg00/awesome-claude-code-toolkit |
+| awesome-agent-skills | https://github.com/VoltAgent/awesome-agent-skills |
+| mcpcat.io | https://mcpcat.io/guides/best-mcp-servers-for-claude-code/ |
+| fal.ai model catalog | https://fal.ai/models |

@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "fal-ai": {
+      "type": "http",
+      "url": "https://mcp.fal.ai/mcp",
+      "headers": {
+        "Authorization": "Bearer ${FAL_KEY}"
+      },
+      "description": "fal.ai catalog — 1000+ models, dynamic model selection, pricing check"
+    },
+    "fal-local": {
+      "command": "node",
+      "args": ["node_modules/fal-image-video-mcp/dist/index.js"],
+      "env": {
+        "FAL_KEY": "${FAL_KEY}",
+        "DOWNLOAD_PATH": "output/renders/",
+        "AUTOOPEN": "true"
+      },
+      "description": "fal.ai local — auto-downloads renders to output/renders/, auto-opens result"
+    },
+    "image-viewer": {
+      "command": "image-viewer-mcp",
+      "description": "Shows renders inline in Claude chat (JPG, PNG, WebP)"
+    },
+    "higgsfield": {
+      "type": "http",
+      "url": "https://mcp.higgsfield.ai",
+      "headers": {
+        "Authorization": "Bearer ${HIGGSFIELD_KEY}"
+      },
+      "description": "Video from renders — Sora 2, Veo 3.1, Kling 3.0. Flythrough presentations."
+    }
+  }
+}
