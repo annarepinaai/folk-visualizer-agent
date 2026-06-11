@@ -122,7 +122,8 @@ python scripts/viz_render.py --mode gpt --count 2 \
 
 | Режим | Модель | Для чего |
 |-------|--------|----------|
-| `gpt` | GPT Image 2 | ArchiCAD/SketchUp → фотореализм. **Основной режим.** |
+| `gpt` | GPT Image 2 (fal.ai) | ArchiCAD/SketchUp → фотореализм. Лучший контроль промпта. **Основной режим.** |
+| `visoid` | Visoid API | Архитектурно-настроенный рендер, 4K. Принимает .DAE/.GLB напрямую. Требует `VISOID_KEY`. |
 | `concept` | Nano Banana 2 | Быстрый набросок атмосферы из текста (~30 сек) |
 | `precise` | FLUX + ControlNet | (отключён — хуже GPT для cartoon→photo) |
 | `edit` | FLUX Kontext | (отключён) |

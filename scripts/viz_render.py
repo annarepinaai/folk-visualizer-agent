@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """
 viz_render.py — Folk Studio Visualizer
-Calls fal.ai API for architectural visualization.
+Calls fal.ai and Visoid APIs for architectural visualization.
 
 MODES:
   concept  — Nano Banana 2 (fast concept, 30 sec, cheap)
   precise  — FLUX.1 Dev + ControlNet img2img (geometry-preserving, main tool)
   edit     — FLUX Kontext Pro (targeted material/style editing, 5 sec)
   final    — FLUX Pro Ultra (4K presentation renders)
+  gpt      — GPT Image 2 (instruction-following, layout preservation) [MAIN]
+  visoid   — Visoid API (architecture-tuned, 4K, good geometry, DAE/GLB upload)
 
 Usage:
   # Quick concept from text only:
@@ -30,6 +32,10 @@ Usage:
 
   # GPT Image 2 — best for instruction-following layout preservation:
   python scripts/viz_render.py --image model_color.jpg --control lineart.jpg --prompt "..." --mode gpt
+
+  # Visoid — architecture-tuned, 4K, good with complex geometry:
+  python scripts/viz_render.py --image model.jpg --prompt "..." --mode visoid
+  python scripts/viz_render.py --image model.dae --prompt "..." --mode visoid   # 3D model upload
 """
 
 import os
@@ -52,6 +58,10 @@ ENDPOINTS = {
     "final":        "fal-ai/flux-pro/v1.1-ultra",
     "gpt":          "openai/gpt-image-2/edit",
 }
+
+# Visoid REST API — architecture-tuned, 4K output, supports 3D model upload
+# Docs: https://app.visoid.com/docs  (requires account)
+VISOID_API_URL = "https://api.visoid.com/v1/render"  # TODO: verify exact URL from docs
 
 CONTROLNET_CANNY = "InstantX/FLUX.1-dev-Controlnet-Canny"
 
@@ -89,6 +99,108 @@ def load_env():
             if "=" in line and not line.startswith("#"):
                 key, _, val = line.partition("=")
                 os.environ.setdefault(key.strip(), val.strip())
+
+
+def render_visoid(
+    prompt: str,
+    image_path: str = None,
+    count: int = 3,
+) -> list:
+    """
+    Render via Visoid REST API.
+    Requires VISOID_KEY in .env (get from app.visoid.com → Settings → API).
+
+    Supported input formats: JPG, PNG, DAE, GLB (3D model files).
+    Output: JPG up to 4K.
+
+    Before using: confirm exact endpoint and payload fields at app.visoid.com/docs
+    """
+    load_env()
+    visoid_key = os.getenv("VISOID_KEY")
+
+    if not visoid_key:
+        print("ERROR: VISOID_KEY not found. Add to .env:", file=sys.stderr)
+        print("  VISOID_KEY=your_key_from_app.visoid.com", file=sys.stderr)
+        return []
+
+    out_dir = Path("output/renders")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    results = []
+    is_3d_model = image_path and Path(image_path).suffix.lower() in (".dae", ".glb", ".obj")
+
+    for i in range(count):
+        print(f"  Generating variant {i + 1}/{count} [visoid]...", file=sys.stderr)
+
+        headers = {
+            "Authorization": f"Bearer {visoid_key}",
+            # TODO: check docs — some APIs use "X-API-Key" instead of Bearer
+        }
+
+        try:
+            if is_3d_model:
+                # Upload 3D model as multipart — preserves exact geometry
+                with open(image_path, "rb") as f:
+                    files = {"model": (Path(image_path).name, f, "application/octet-stream")}
+                    data = {
+                        "prompt": prompt,
+                        "quality": "high",
+                        # TODO: check docs for supported style/material params
+                    }
+                    resp = requests.post(VISOID_API_URL, headers=headers, files=files, data=data, timeout=360)
+            elif image_path:
+                # Image-based render (JPG/PNG screenshot of model)
+                payload = {
+                    "prompt": prompt,
+                    "image": image_to_base64(image_path),
+                    "quality": "high",
+                    # TODO: check docs for available style/material/season params
+                }
+                resp = requests.post(VISOID_API_URL, headers=headers, json=payload, timeout=360)
+            else:
+                # Text-to-render
+                payload = {
+                    "prompt": prompt,
+                    "quality": "high",
+                }
+                resp = requests.post(VISOID_API_URL, headers=headers, json=payload, timeout=360)
+
+            resp.raise_for_status()
+            data = resp.json()
+
+        except requests.exceptions.HTTPError:
+            print(f"  HTTP {resp.status_code}: {resp.text[:300]}", file=sys.stderr)
+            if resp.status_code == 401:
+                print("  → Check VISOID_KEY in .env", file=sys.stderr)
+            elif resp.status_code == 402:
+                print("  → Top up balance at app.visoid.com/billing", file=sys.stderr)
+            elif resp.status_code == 422:
+                print("  → Invalid payload. Check endpoint/params at app.visoid.com/docs", file=sys.stderr)
+                print(f"  → Sent to: {VISOID_API_URL}", file=sys.stderr)
+                print("  → If 422 persists: verify VISOID_API_URL constant at top of this file", file=sys.stderr)
+            continue
+        except requests.exceptions.Timeout:
+            print("  → Timeout (>360s). Visoid may be processing — check app.visoid.com", file=sys.stderr)
+            continue
+
+        img_url = extract_image_url(data)
+        if not img_url:
+            print(f"  No image URL in response: {json.dumps(data)[:300]}", file=sys.stderr)
+            print("  → Response format may differ from expected. Check docs.", file=sys.stderr)
+            continue
+
+        out_path = out_dir / f"render_visoid_{timestamp}_{i + 1}.jpg"
+        try:
+            download_image(img_url, out_path)
+        except Exception as e:
+            print(f"  Failed to download: {e}", file=sys.stderr)
+            continue
+
+        results.append(str(out_path))
+        print(f"  ✓ {out_path}", file=sys.stderr)
+
+    return results
 
 
 def image_to_base64(path: str) -> str:
@@ -182,6 +294,10 @@ def render(
     steps: int = None,
     guidance: float = None,
 ) -> list:
+    # Visoid has its own function — route directly
+    if mode == "visoid":
+        return render_visoid(prompt=prompt, image_path=image_path, count=count)
+
     load_env()
     fal_key = os.getenv("FAL_KEY")
 
@@ -261,8 +377,11 @@ Modes:
   precise  Geometry-preserving render (FLUX + ControlNet). Main tool for SketchUp exports.
   edit     Targeted edits on existing render (FLUX Kontext). Change one material in 5 sec.
   final    4K presentation quality (FLUX Pro Ultra). Use before sending to client.
+  gpt      GPT Image 2 (via fal.ai). Best geometry preservation. Requires FAL_KEY.
+  visoid   Visoid API. Architecture-tuned, 4K. Accepts JPG/PNG or DAE/GLB 3D models.
+           Requires VISOID_KEY in .env (get at app.visoid.com → Settings → API).
 
-Strength guide:
+Strength guide (FLUX modes only, not applicable to gpt/visoid):
   0.50-0.65  Stay close to source geometry
   0.65-0.75  Balanced transformation (default)
   0.80-0.90  Strong style change, geometry loosens
@@ -273,7 +392,7 @@ Strength guide:
     parser.add_argument("--image", help="Source image (SketchUp export, photo, sketch)")
     parser.add_argument("--control", help="Lineart/edge image for ControlNet geometry lock (precise mode)")
     parser.add_argument("--mode", default="concept",
-                        choices=["concept", "precise", "edit", "final", "gpt"],
+                        choices=["concept", "precise", "edit", "final", "gpt", "visoid"],
                         help="Rendering mode (default: concept)")
     parser.add_argument("--count", type=int, default=3, help="Number of variants (default: 3)")
     parser.add_argument("--strength", type=float, help="Transformation strength 0.5-1.0")
@@ -289,6 +408,7 @@ Strength guide:
         "edit":    "FLUX Kontext Pro — targeted editing",
         "final":   "FLUX Pro Ultra — 4K presentation",
         "gpt":     "GPT Image 2 — instruction-following, layout preservation",
+        "visoid":  "Visoid API — architecture-tuned, 4K, DAE/GLB model upload",
     }
 
     print(f"\n🎨 Folk Studio Visualizer", file=sys.stderr)
